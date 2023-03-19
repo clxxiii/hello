@@ -6,12 +6,7 @@ This is a monorepo to track and document my progress in learning new technologie
 
 If you find anything in here that is wrong or misleading, please let me know. This is meant as both a learning place for me, but also to provide examples to others to better your understanding as well!
 
-## Languages
+## Entries
 
-### - [Rust](./rust)
-
-I have no experience with rust, but it seems like it is going to be really useful to know in the future
-
-### - [C#](./csharp)
-
-I have no experience with C#, but I want to learn it specifically for Game modding.
+- 🦀 **[Rust](./rust)** I have no experience with rust, but it seems like it is going to be really useful to know in the future
+- 🥾 **[Springboot](./springboot)** A super simple quickstart application for getting springboot running.
