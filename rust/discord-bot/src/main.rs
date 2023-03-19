@@ -1,9 +1,9 @@
 use discord::{model::Event, Discord};
+use std::env;
 
 fn main() {
-    let client: Discord =
-        Discord::from_bot_token("Nzc3NTY4NDc1Nzk5MzU1NDYz.X7FVEw.05jeXXCQZ4uYMgq8lG9FLyov3aw")
-            .expect("login failed");
+    let client: Discord = Discord::from_bot_token(&env::var("DISCORD_TOKEN").expect("no token"))
+        .expect("login failed");
 
     let (mut connection, _) = client.connect().expect("connect failed");
     loop {
