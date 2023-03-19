@@ -8,10 +8,10 @@ If you find anything in here that is wrong or misleading, please let me know. Th
 
 ## Languages
 
-### - [Rust](./main/blob/rust)
+### - [Rust](./rust)
 
 I have no experience with rust, but it seems like it is going to be really useful to know in the future
 
-### - [C#](./main/blob/csharp)
+### - [C#](./csharp)
 
 I have no experience with C#, but I want to learn it specifically for Game modding.
