@@ -1,13 +1,16 @@
+# Special Type: Query
+# Dictates all the different query functions your API supports
 type Query {
-	# Super simple queries
-	hello: String
-	greeting(name: String): String
-	getUserByName(username: String): User
-	allPosts: [Post!]!
+	hello: String # Hello World
+	greeting(name: String): String # Greet the user with their name
+	getUserByName(username: String): User # Accesses the database and gets a user's name
+	allPosts: [Post!]! # Gets every post in the database
 }
 
+# Special Type: Mutation
+# Mutations are the writes, make changes to your database (create, update, or delete).
 type Mutation {
-	makePost(username: String, content: String): Post
+	makePost(username: String, content: String): Post # Creates a new post with a given username and content (and creates a user if there's no associated username)
 }
 
 type User {
