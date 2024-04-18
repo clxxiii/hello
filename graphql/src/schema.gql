@@ -2,4 +2,28 @@ type Query {
 	# Super simple queries
 	hello: String
 	greeting(name: String): String
+	getUserByName(username: String): User
+	allPosts: [Post!]!
+}
+
+type User {
+	id: String
+	username: String
+
+	posts: [Post!]!
+	likes: [Post!]!
+}
+
+type Post {
+ id: String
+ content: String
+ date_posted: String
+
+ author: User
+ likes: [User!]!
+}
+
+type Like {
+	author: User
+	post: Post
 }

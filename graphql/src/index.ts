@@ -1,18 +1,24 @@
 import express from "express";
-import { createHandler } from "graphql-http/lib/use/express";
+// import { createHandler } from "graphql-http/lib/use/express";
 import { ruruHTML } from "ruru/server"
 import { readFileSync } from "fs";
-import { buildSchema } from "graphql";
-import * as rootValue from "./endpoints"
+import { graphqlHTTP } from "express-graphql";
+// import { buildSchema } from "graphql";
+import { makeExecutableSchema } from "@graphql-tools/schema";
+import resolvers from "./resolvers"
 
-const schema = buildSchema(readFileSync("./src/schema.gql").toString());
+const typeDefs = (readFileSync("./src/schema.gql").toString());
+
+const schema = makeExecutableSchema({
+  typeDefs,
+  resolvers
+})
 
 const app = express();
 app.all(
   "/graphql",
-  createHandler({
+  graphqlHTTP({
     schema,
-    rootValue
   })
 ).get(
   "/", (_req, res) => {
