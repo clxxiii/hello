@@ -9,6 +9,7 @@ import { readFileSync } from "fs";
 import { graphqlHTTP } from "express-graphql";
 import { makeExecutableSchema } from "@graphql-tools/schema";
 import resolvers from "./resolvers"
+import { env } from "bun";
 
 const typeDefs = (readFileSync("./src/schema.gql").toString()); // Pull Schema from schema file
 
@@ -29,4 +30,6 @@ app.all(
     res.type("html");
     res.end(ruruHTML({ endpoint: "/graphql" }))
   }
-).listen(5173)
+).listen(env.PORT ?? 5173, () => {
+  console.log(`View the API workspace at http://localhost:${env.PORT ?? 5173}`)
+})
