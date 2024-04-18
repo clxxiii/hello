@@ -5,7 +5,7 @@ import { readFileSync } from "fs";
 import { buildSchema } from "graphql";
 import * as rootValue from "./endpoints"
 
-const schema = buildSchema(readFileSync("./schema.gql").toString());
+const schema = buildSchema(readFileSync("./src/schema.gql").toString());
 
 const app = express();
 app.all(
