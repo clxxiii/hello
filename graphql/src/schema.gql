@@ -6,6 +6,10 @@ type Query {
 	allPosts: [Post!]!
 }
 
+type Mutation {
+	makePost(username: String, content: String): Post
+}
+
 type User {
 	id: String
 	username: String

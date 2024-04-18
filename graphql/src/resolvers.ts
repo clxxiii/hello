@@ -32,5 +32,20 @@ export default {
   Like: {
     author: (like: Like) => prisma.user.findUnique({ where: { id: like.user_id } }),
     post: (like: Like) => prisma.post.findUnique({ where: { id: like.post_id } })
+  },
+
+  Mutation: {
+    makePost: (_: undefined, params: { content: string, username: string }) => (
+      prisma.post.create({
+        data: {
+          author: {
+            connectOrCreate: {
+              where: { username: params.username },
+              create: { username: params.username }
+            }
+          },
+          content: params.content
+        }
+      }))
   }
 }
