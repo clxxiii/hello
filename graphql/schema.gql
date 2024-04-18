@@ -1,0 +1,5 @@
+type Query {
+	# Super simple queries
+	hello: String
+	greeting(name: String): String
+}
