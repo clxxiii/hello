@@ -3,8 +3,9 @@
   "module": "index.ts",
   "type": "module",
   "scripts": {
-    "pu": "bun run src/publisher.ts",
-    "co": "bun run src/consumer.ts"
+    "hello:p": "bun run src/hello-world/publisher.ts",
+    "hello:c": "bun run src/hello-world/consumer.ts",
+    "ss:run": "bun run src/synced-services/index.ts"
   },
   "devDependencies": {
     "@types/amqplib": "^0.10.6",
