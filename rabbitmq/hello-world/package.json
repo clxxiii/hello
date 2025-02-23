@@ -1,0 +1,19 @@
+{
+  "name": "rabbitmq",
+  "module": "index.ts",
+  "type": "module",
+  "scripts": {
+    "pu": "bun run src/publisher.ts",
+    "co": "bun run src/consumer.ts"
+  },
+  "devDependencies": {
+    "@types/amqplib": "^0.10.6",
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "amqplib": "^0.10.5"
+  }
+}
