@@ -22,6 +22,7 @@ async fn main() {
 
     let router = Router::new()
         .route("/graphql", post(graphql))
+        .route("/schema", get(sdl))
         .route("/", get(gui))
         .with_state(state);
 
@@ -44,4 +45,9 @@ async fn graphql(
 
 async fn gui() -> axum::response::Html<String> {
     axum::response::Html(graphiql_source("/graphql", None))
+}
+
+async fn sdl() -> axum::response::Response {
+    let schema = schema::create_schema();
+    axum::response::Response::new(schema.as_sdl().into())
 }
