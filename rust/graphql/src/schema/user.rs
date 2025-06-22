@@ -19,15 +19,10 @@ impl User {
     }
 
     async fn posts(&self, context: &Context) -> Vec<Post> {
-        let mut connection = context.pool.acquire().await.unwrap();
-
         let query = format!("SELECT * FROM Post WHERE author_id={}", self.id);
-        match sqlx::query_as(query.as_str())
-            .fetch_all(connection.as_mut())
+        sqlx::query_as(query.as_str())
+            .fetch_all(&context.pool)
             .await
-        {
-            Ok(posts) => posts,
-            Err(_) => Vec::new(),
-        }
+            .unwrap_or(Vec::new())
     }
 }

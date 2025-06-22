@@ -17,11 +17,9 @@ impl QueryRoot {
 
     #[graphql(description = "Gets a post by their username")]
     async fn get_user_by_name(context: &Context, username: String) -> FieldResult<User> {
-        let mut connection = context.pool.acquire().await.unwrap();
-
         let query = format!("SELECT * FROM User WHERE username='{username}';");
         sqlx::query_as(query.as_str())
-            .fetch_one(connection.as_mut())
+            .fetch_one(&context.pool)
             .await
             .map_err(|e| {
                 FieldError::new(e.to_string(), graphql_value!({ "error": "User not found"}))
@@ -30,10 +28,8 @@ impl QueryRoot {
 
     #[graphql(description = "Lists all posts")]
     async fn all_posts(context: &Context) -> FieldResult<Vec<Post>> {
-        let mut connection = context.pool.acquire().await.unwrap();
-
         sqlx::query_as("SELECT * FROM Post;")
-            .fetch_all(connection.as_mut())
+            .fetch_all(&context.pool)
             .await
             .map_err(|_| {
                 FieldError::new(
@@ -49,14 +45,12 @@ pub struct MutationRoot;
 #[juniper::graphql_object(Context = Context)]
 impl MutationRoot {
     async fn make_post(context: &Context, user_id: i32, content: String) -> FieldResult<Post> {
-        let mut connection = context.pool.acquire().await.unwrap();
-
         let query = format!(
             "INSERT INTO Post (content, author_id) VALUES ('{content}', {user_id}) RETURNING *;"
         );
 
         sqlx::query_as(query.as_str())
-            .fetch_one(connection.as_mut())
+            .fetch_one(&context.pool)
             .await
             .map_err(|e| {
                 FieldError::new(

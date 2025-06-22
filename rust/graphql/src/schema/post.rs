@@ -18,15 +18,9 @@ impl Post {
         &self.content
     }
     async fn author(&self, context: &Context) -> Option<User> {
-        let mut connection = context.pool.acquire().await.unwrap();
-
-        let query = format!("SELECT * FROM User WHERE id={}", self.author_id);
-        match sqlx::query_as(query.as_str())
-            .fetch_one(connection.as_mut())
+        sqlx::query_as(format!("SELECT * FROM User WHERE id={}", self.author_id).as_str())
+            .fetch_one(&context.pool)
             .await
-        {
-            Ok(user) => Some(user),
-            Err(_) => None,
-        }
+            .ok()
     }
 }

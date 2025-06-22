@@ -27,9 +27,13 @@ async fn main() {
         .with_state(state);
 
     let addr = "0.0.0.0:3000";
-    let listener = tokio::net::TcpListener::bind(addr)
-        .await
-        .expect(format!("Failed to listen at {}", addr).as_str());
+    let listener = tokio::net::TcpListener::bind(addr).await.expect(
+        format!(
+            "Address {} should be available so a connection can be opened",
+            addr
+        )
+        .as_str(),
+    );
 
     axum::serve(listener, router).await.unwrap();
 }
