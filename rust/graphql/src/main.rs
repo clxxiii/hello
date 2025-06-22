@@ -11,6 +11,24 @@ use std::sync::Arc;
 
 use crate::schema::Context;
 
+async fn graphql(
+    State(context): State<Arc<Context>>,
+    Json(payload): Json<GraphQLRequest>,
+) -> axum::response::Json<GraphQLResponse> {
+    let schema = schema::create_schema();
+    let res = payload.execute(&schema, &context).await;
+    axum::response::Json(res)
+}
+
+async fn gui() -> axum::response::Html<String> {
+    axum::response::Html(graphiql_source("/graphql", None))
+}
+
+async fn sdl() -> axum::response::Response {
+    let schema = schema::create_schema();
+    axum::response::Response::new(schema.as_sdl().into())
+}
+
 #[tokio::main]
 async fn main() {
     let config = Config::new();
@@ -36,22 +54,4 @@ async fn main() {
     );
 
     axum::serve(listener, router).await.unwrap();
-}
-
-async fn graphql(
-    State(context): State<Arc<Context>>,
-    Json(payload): Json<GraphQLRequest>,
-) -> axum::response::Json<GraphQLResponse> {
-    let schema = schema::create_schema();
-    let res = payload.execute(&schema, &context).await;
-    axum::response::Json(res)
-}
-
-async fn gui() -> axum::response::Html<String> {
-    axum::response::Html(graphiql_source("/graphql", None))
-}
-
-async fn sdl() -> axum::response::Response {
-    let schema = schema::create_schema();
-    axum::response::Response::new(schema.as_sdl().into())
 }
