@@ -1,5 +1,3 @@
-BEGIN TRANSACTION;
-
 -- Create Tables --
 CREATE TABLE User (id INTEGER PRIMARY KEY, username TEXT NOT NULL);
 
@@ -32,5 +30,3 @@ VALUES
     ('Life is like roblox', 0),
     ('And what is this called?', 0),
     ('I like this DJ Khaled guy', 1);
-
-COMMIT;
