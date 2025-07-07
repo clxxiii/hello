@@ -1,5 +1,10 @@
+use std::time::Duration;
+
 use super::{Context, post::Post, user::User};
+use futures::stream::{BoxStream, StreamExt as _};
 use juniper::{FieldError, FieldResult, graphql_value};
+use tokio::time::interval;
+use tokio_stream::wrappers::IntervalStream;
 
 pub struct QueryRoot;
 
@@ -58,5 +63,22 @@ impl MutationRoot {
                     graphql_value!({ "error": "Failed to make post"}),
                 )
             })
+    }
+}
+
+pub struct SubscriptionRoot;
+
+type NumberStream = BoxStream<'static, FieldResult<i32>>;
+
+#[juniper::graphql_subscription(Context = Context)]
+impl SubscriptionRoot {
+    /// Counts seconds.
+    async fn count() -> NumberStream {
+        let mut value = 0;
+        let stream = IntervalStream::new(interval(Duration::from_secs(1))).map(move |_| {
+            value += 1;
+            Ok(value)
+        });
+        Box::pin(stream)
     }
 }

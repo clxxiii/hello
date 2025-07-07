@@ -1,11 +1,14 @@
 mod schema;
 use axum::{
-    Extension, Router,
+    Router,
+    extract::Extension,
     routing::{MethodFilter, get, on},
 };
 use graphql::config::Config;
-use juniper::http::graphiql::graphiql_source;
-use juniper_axum::{extract::JuniperRequest, graphiql, response::JuniperResponse};
+use juniper_axum::{
+    extract::JuniperRequest, graphiql, graphql_transport_ws, response::JuniperResponse,
+};
+use juniper_graphql_ws::ConnectionConfig;
 
 use std::sync::Arc;
 
@@ -17,7 +20,7 @@ async fn sdl(Extension(schema): Extension<Arc<Schema>>) -> axum::response::Respo
 
 async fn handle_graphql(
     Extension(schema): Extension<Arc<Schema>>,
-    Extension(context): Extension<Arc<Context>>,
+    Extension(context): Extension<Context>,
     JuniperRequest(request): JuniperRequest,
 ) -> JuniperResponse {
     JuniperResponse(request.execute(&*schema, &context).await)
@@ -31,18 +34,21 @@ async fn main() {
         .unwrap();
     let schema = schema::create_schema();
 
-    let state = Arc::new(Context { pool });
+    let state = Context { pool };
 
     let router = Router::new()
         .route(
             "/graphql",
             on(MethodFilter::GET.or(MethodFilter::POST), handle_graphql),
         )
-        .route("/schema", get(sdl))
         .route(
-            "/",
-            get(axum::response::Html(graphiql_source("/graphql", None))),
+            "/subscriptions",
+            get(graphql_transport_ws::<Arc<Schema>>(ConnectionConfig::new(
+                state.clone(),
+            ))),
         )
+        .route("/schema", get(sdl))
+        .route("/", get(graphiql("/graphql", "/subscriptions")))
         .layer(Extension(Arc::new(schema)))
         .layer(Extension(state));
 

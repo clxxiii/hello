@@ -534,10 +534,13 @@ name = "graphql"
 version = "0.1.0"
 dependencies = [
  "axum",
+ "futures",
  "juniper",
  "juniper_axum",
+ "juniper_graphql_ws",
  "sqlx",
  "tokio",
+ "tokio-stream",
 ]
 
 [[package]]
