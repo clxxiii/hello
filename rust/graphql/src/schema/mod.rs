@@ -4,7 +4,7 @@ pub mod root;
 pub mod user;
 
 use juniper::RootNode;
-use root::{MutationRoot, QueryRoot, SubscriptionRoot};
+use root::{Mutations, Query, Subscriptions};
 use sqlx::{Pool, Sqlite};
 
 #[derive(Clone)]
@@ -14,8 +14,8 @@ pub struct Context {
 
 impl juniper::Context for Context {}
 
-pub type Schema = RootNode<'static, QueryRoot, MutationRoot, SubscriptionRoot>;
+pub type Schema = RootNode<'static, Query, Mutations, Subscriptions>;
 
 pub fn create_schema() -> Schema {
-    Schema::new(QueryRoot, MutationRoot, SubscriptionRoot)
+    Schema::new(Query, Mutations, Subscriptions)
 }

@@ -6,10 +6,10 @@ use juniper::{FieldError, FieldResult, graphql_value};
 use tokio::time::interval;
 use tokio_stream::wrappers::IntervalStream;
 
-pub struct QueryRoot;
+pub struct Query;
 
 #[juniper::graphql_object(Context = Context)]
-impl QueryRoot {
+impl Query {
     #[graphql(description = "Greets the user")]
     fn hello() -> FieldResult<String> {
         Ok(String::from("Hello!"))
@@ -45,10 +45,10 @@ impl QueryRoot {
     }
 }
 
-pub struct MutationRoot;
+pub struct Mutations;
 
 #[juniper::graphql_object(Context = Context)]
-impl MutationRoot {
+impl Mutations {
     async fn make_post(context: &Context, user_id: i32, content: String) -> FieldResult<Post> {
         let query = format!(
             "INSERT INTO Post (content, author_id) VALUES ('{content}', {user_id}) RETURNING *;"
@@ -66,12 +66,12 @@ impl MutationRoot {
     }
 }
 
-pub struct SubscriptionRoot;
+pub struct Subscriptions;
 
 type NumberStream = BoxStream<'static, FieldResult<i32>>;
 
 #[juniper::graphql_subscription(Context = Context)]
-impl SubscriptionRoot {
+impl Subscriptions {
     /// Counts seconds.
     async fn count() -> NumberStream {
         let mut value = 0;
