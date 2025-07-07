@@ -4,10 +4,8 @@ pub mod root;
 pub mod user;
 
 use juniper::{EmptySubscription, RootNode};
-use root::QueryRoot;
+use root::{MutationRoot, QueryRoot};
 use sqlx::{Pool, Sqlite};
-
-use crate::schema::root::MutationRoot;
 
 pub struct Context {
     pub pool: Pool<Sqlite>,

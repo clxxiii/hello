@@ -1,32 +1,26 @@
 mod schema;
 use axum::{
-    Json, Router,
-    extract::State,
-    routing::{get, post},
+    Extension, Router,
+    routing::{MethodFilter, get, on},
 };
 use graphql::config::Config;
-use juniper::http::{GraphQLRequest, GraphQLResponse, graphiql::graphiql_source};
+use juniper::http::graphiql::graphiql_source;
+use juniper_axum::{extract::JuniperRequest, graphiql, response::JuniperResponse};
 
 use std::sync::Arc;
 
-use crate::schema::Context;
+use schema::{Context, Schema};
 
-async fn graphql(
-    State(context): State<Arc<Context>>,
-    Json(payload): Json<GraphQLRequest>,
-) -> axum::response::Json<GraphQLResponse> {
-    let schema = schema::create_schema();
-    let res = payload.execute(&schema, &context).await;
-    axum::response::Json(res)
-}
-
-async fn gui() -> axum::response::Html<String> {
-    axum::response::Html(graphiql_source("/graphql", None))
-}
-
-async fn sdl() -> axum::response::Response {
-    let schema = schema::create_schema();
+async fn sdl(Extension(schema): Extension<Arc<Schema>>) -> axum::response::Response {
     axum::response::Response::new(schema.as_sdl().into())
+}
+
+async fn handle_graphql(
+    Extension(schema): Extension<Arc<Schema>>,
+    Extension(context): Extension<Arc<Context>>,
+    JuniperRequest(request): JuniperRequest,
+) -> JuniperResponse {
+    JuniperResponse(request.execute(&*schema, &context).await)
 }
 
 #[tokio::main]
@@ -35,14 +29,22 @@ async fn main() {
     let pool = sqlx::sqlite::SqlitePool::connect(&config.db_url)
         .await
         .unwrap();
+    let schema = schema::create_schema();
 
     let state = Arc::new(Context { pool });
 
     let router = Router::new()
-        .route("/graphql", post(graphql))
+        .route(
+            "/graphql",
+            on(MethodFilter::GET.or(MethodFilter::POST), handle_graphql),
+        )
         .route("/schema", get(sdl))
-        .route("/", get(gui))
-        .with_state(state);
+        .route(
+            "/",
+            get(axum::response::Html(graphiql_source("/graphql", None))),
+        )
+        .layer(Extension(Arc::new(schema)))
+        .layer(Extension(state));
 
     let addr = "0.0.0.0:3000";
     let listener = tokio::net::TcpListener::bind(addr).await.expect(
@@ -53,5 +55,6 @@ async fn main() {
         .as_str(),
     );
 
+    println!("Opened connection at http://localhost:3000");
     axum::serve(listener, router).await.unwrap();
 }
