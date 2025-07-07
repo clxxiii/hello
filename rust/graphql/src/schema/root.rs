@@ -10,17 +10,17 @@ pub struct Query;
 
 #[juniper::graphql_object(Context = Context)]
 impl Query {
-    #[graphql(description = "Greets the user")]
+    /// Greets the user
     fn hello() -> FieldResult<String> {
         Ok(String::from("Hello!"))
     }
 
-    #[graphql(description = "Greets the user with a name")]
+    /// Greets the user with a name
     fn greeting(name: String) -> FieldResult<String> {
         Ok(format!("Hello, {name}"))
     }
 
-    #[graphql(description = "Gets a post by their username")]
+    /// Gets a post by their username
     async fn get_user_by_name(context: &Context, username: String) -> FieldResult<User> {
         let query = format!("SELECT * FROM User WHERE username='{username}';");
         sqlx::query_as(query.as_str())
@@ -31,7 +31,7 @@ impl Query {
             })
     }
 
-    #[graphql(description = "Lists all posts")]
+    /// Lists all posts
     async fn all_posts(context: &Context) -> FieldResult<Vec<Post>> {
         sqlx::query_as("SELECT * FROM Post;")
             .fetch_all(&context.pool)
