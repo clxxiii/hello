@@ -19,8 +19,8 @@ impl User {
     }
 
     async fn posts(&self, context: &Context) -> Vec<Post> {
-        let query = format!("SELECT * FROM Post WHERE author_id={}", self.id);
-        sqlx::query_as(query.as_str())
+        sqlx::query_as("SELECT * FROM Post WHERE author_id=$1;")
+            .bind(&self.id)
             .fetch_all(&context.pool)
             .await
             .unwrap_or(Vec::new())

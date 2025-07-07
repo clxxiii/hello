@@ -18,8 +18,8 @@ impl Query {
 
     /// Gets a post by their username
     async fn get_user_by_name(context: &Context, username: String) -> FieldResult<User> {
-        let query = format!("SELECT * FROM User WHERE username='{username}';");
-        sqlx::query_as(query.as_str())
+        sqlx::query_as("SELECT * FROM User WHERE username=$1;")
+            .bind(&username)
             .fetch_one(&context.pool)
             .await
             .map_err(|e| {

@@ -18,7 +18,8 @@ impl Post {
         &self.content
     }
     async fn author(&self, context: &Context) -> Option<User> {
-        sqlx::query_as(format!("SELECT * FROM User WHERE id={}", self.author_id).as_str())
+        sqlx::query_as("SELECT * FROM User WHERE id=$1;")
+            .bind(&self.author_id)
             .fetch_one(&context.pool)
             .await
             .ok()
