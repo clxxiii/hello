@@ -9,6 +9,7 @@ use juniper_axum::{
     extract::JuniperRequest, graphiql, graphql_transport_ws, response::JuniperResponse,
 };
 use juniper_graphql_ws::ConnectionConfig;
+use tokio::sync::broadcast::channel;
 
 use std::sync::Arc;
 
@@ -33,8 +34,12 @@ async fn main() {
         .await
         .unwrap();
     let schema = schema::create_schema();
+    let (tx, _rx) = channel(1024);
 
-    let state = Context { pool };
+    let state = Context {
+        pool,
+        post_likes_broadcast: tx,
+    };
 
     let router = Router::new()
         .route(

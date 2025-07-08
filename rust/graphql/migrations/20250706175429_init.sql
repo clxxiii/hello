@@ -5,10 +5,11 @@ CREATE TABLE Post (
     id INTEGER PRIMARY KEY,
     content TEXT NOT NULL DEFAULT '',
     author_id INTEGER NOT NULL,
+    likes INTEGER NOT NULL DEFAULT 0,
     FOREIGN KEY (author_id) REFERENCES User (id)
 );
 
-CREATE TABLE Like (
+CREATE TABLE Repost (
     user_id TEXT NOT NULL,
     post_id INTEGER NOT NULL,
     FOREIGN KEY (user_id) REFERENCES User (id),

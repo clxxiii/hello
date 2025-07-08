@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use juniper::{FieldError, FieldResult, graphql_value};
 
 use super::{Context, post::Post};
@@ -18,5 +20,23 @@ impl Mutations {
                     graphql_value!({ "error": "Failed to make post"}),
                 )
             })
+    }
+    async fn like_post(context: &Context, post_id: i32) -> FieldResult<Arc<Post>> {
+        let post: Post =
+            sqlx::query_as("UPDATE Post SET likes = likes + 1 WHERE id=$1 RETURNING *;")
+                .bind(&post_id)
+                .fetch_one(&context.pool)
+                .await
+                .map_err(|e| {
+                    FieldError::new(
+                        e.to_string(),
+                        graphql_value!({ "error": "failed to update post"}),
+                    )
+                })?;
+
+        let post = Arc::new(post);
+        let _ = context.post_likes_broadcast.send(Arc::clone(&post));
+
+        Ok(post)
     }
 }
